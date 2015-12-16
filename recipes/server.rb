@@ -28,10 +28,12 @@ end
 static_tcp_reg_key = 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Microsoft SQL Server\\' + node['sql_server']['reg_version'] +
   node['sql_server']['instance_name'] + '\MSSQLServer\SuperSocketNetLib\Tcp\IPAll'
 
-# generate and set a password for the 'sa' super user
-node.set_unless['sql_server']['server_sa_password'] = "#{secure_password}-aA12"
-# force a save so we don't lose our generated password on a failed chef run
-node.save unless Chef::Config[:solo]
+if node['sql_server']['auto_generate_password']
+  # generate and set a password for the 'sa' super user
+  node.set_unless['sql_server']['server_sa_password'] = "#{secure_password}-aA12"
+  # force a save so we don't lose our generated password on a failed chef run
+  node.save unless Chef::Config[:solo]
+end
 
 config_file_path = win_friendly_path(File.join(Chef::Config[:file_cache_path], "ConfigurationFile.ini"))
 
